@@ -14,7 +14,7 @@ int main(void)
     SubmitButton submit_btn;
     ModelNN model;
 
-    if (!model.loadModel("../model/trained_params.txt")) {
+    if (!model.loadModel("../model/mlp/trained_params.txt")) {
         std::cerr << "Failed to load model from ../model/trained_params.txt\n";
         return 1;
     }
