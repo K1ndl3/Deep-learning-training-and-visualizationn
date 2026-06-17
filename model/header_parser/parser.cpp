@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include <cstddef>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
@@ -40,7 +41,7 @@ std::vector<uint8_t> Parser::parseLabel(const std::string& filePath) {
     return label_vector;
 }
 
-std::vector<std::vector<double>> Parser::parseImage(const std::string& filePath) {
+std::vector<MATRIX> Parser::parseImage(const std::string& filePath) {
     std::ifstream image_file(filePath, std::ios::binary);
     if (!image_file) {
         std::cerr << "[ERROR]: Failed to open image file\n";
@@ -58,16 +59,58 @@ std::vector<std::vector<double>> Parser::parseImage(const std::string& filePath)
     image_file.read(reinterpret_cast<char*>(&numImages), 4);
     numImages = REVERSE_BYTES(numImages);
 
-    image_file.read(reinterpret_cast<char*>(numRow), 4);
+    image_file.read(reinterpret_cast<char*>(&numRow), 4);
     numRow = REVERSE_BYTES(numRow);
 
     image_file.read(reinterpret_cast<char*>(&numCol), 4);
     numCol= REVERSE_BYTES(numCol);
-    return {};
+
+    if (!image_file) {
+        std::cerr << "[ERROR]: Failed to read image header\n";
+        return {};
+    }
+
+    // parse the file
+    std::vector<std::vector<std::vector<double>>> imagesData(numImages, 
+                                    std::vector<std::vector<double>>(numRow,
+                                    std::vector<double>(numCol, 0)));
+    std::vector<std::vector<double>> rawPixelVector(numRow, std::vector<double>(numCol, 0));
+
+    for (std::size_t i = 0; i < numImages; ++i) {
+        for (std::size_t row = 0; row < numRow; ++row) {
+            for (std::size_t col = 0; col < numCol; ++col) {
+                uint8_t pixelValue;
+                image_file.read(reinterpret_cast<char*>(&pixelValue), 1);
+                if (!image_file) {
+                    std::cerr << "[ERROR]: Failed to read image data\n";
+                    return {};
+                }
+                rawPixelVector[row][col] = double(pixelValue) / 255.0;
+            }
+        }
+        imagesData[i] = rawPixelVector;
+    }
+
+   return imagesData;
 }
 
-MnistData Parser::parse() {
-    return {};
+std::optional<MnistData> Parser::parse(const std::string& label, const std::string& image) {
+    auto labels = parseLabel(label);
+    if (labels.empty()) {
+        return std::nullopt;
+    }
+
+    auto images = parseImage(image);
+    if (images.empty()) {
+        return std::nullopt;
+    }
+
+    if (labels.size() != images.size()) {
+        std::cerr << "[ERROR]: Label count does not match image count\n";
+        return std::nullopt;
+    }
+
+    return MnistData{std::move(images), std::move(labels)};
 }
 
 int main() {
