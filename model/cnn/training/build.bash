@@ -1,1 +1,1 @@
-g++ main.cpp -o main
+g++ training.cpp ../../header_parser/parser.cpp -o training_cnn

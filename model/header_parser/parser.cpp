@@ -113,6 +113,4 @@ std::optional<MnistData> Parser::parse(const std::string& label, const std::stri
     return MnistData{std::move(images), std::move(labels)};
 }
 
-int main() {
-    return 0;
-}
+
