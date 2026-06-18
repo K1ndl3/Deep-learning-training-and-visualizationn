@@ -1,6 +1,7 @@
 #include "../../header_parser/parser.hpp"
 #include <cstdint>
 #include <optional>
+#include <vector>
 
 
 int main() {
@@ -17,8 +18,15 @@ int main() {
     std::vector<MATRIX> imageData = dataStruct->images;
     std::vector<uint8_t> labelData = dataStruct->labels;
     
+    // tensor for the first image
     MATRIX firstIm = imageData[0];
-    std::vector<MATRIX> tensorIm;
-    tensorIm.push_back(firstIm);
+    std::vector<MATRIX> tensor3D;
+    tensor3D.push_back(firstIm);
+
+    // weights and biases for the convolution layer
+    std::vector<MATRIX> convWeight (8, MATRIX(3, (std::vector<double>(3,0.0))));
+    std::vector<double> convBias(8,0.0);
+
+    // preactivated output of convolution layer
     return 0;
 }
