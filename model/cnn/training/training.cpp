@@ -4,12 +4,13 @@
 #include <cstdint>
 #include <optional>
 #include <vector>
+#include <algorithm>
 
 #define NUM_FILTER 8
 #define NUM_CHANNEL 1
 #define CONV_WEIGHT_NUM_COL 3
 #define CONV_WEIGHT_NUM_ROW 3
-
+#define CONV_LAYER_NUM_ROW_COL 26
 double Relu(double input);
 
 int main() {
@@ -42,9 +43,9 @@ int main() {
     // the output of the convolution layer, activated
     std::vector<MATRIX> convA(NUM_FILTER, MATRIX(26, std::vector<double>(26, 0.0)));
     // forward pass for conv
-    for (std::size_t f = 0; f < 8; ++f) {
-        for (std::size_t row = 0; row < 26; ++row) {
-            for (std::size_t col = 0; col < 26; ++col) {
+    for (std::size_t f = 0; f < NUM_FILTER; ++f) {
+        for (std::size_t row = 0; row < CONV_LAYER_NUM_ROW_COL; ++row) {
+            for (std::size_t col = 0; col < CONV_LAYER_NUM_ROW_COL; ++col) {
                 double sum = 0.0;
                 for (std::size_t i = 0; i < 3; ++i) {
                     for (std::size_t j = 0; j < 3; ++j) {
