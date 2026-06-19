@@ -103,6 +103,16 @@ int main() {
             }
         }
     }
+
+    // weights and baises for the layers
+    MATRIX w1(MLP_H1_SIZE, std::vector<double>(MLP_INPUT_SIZE, 0.0));
+    std::vector<double> b1(MLP_H1_SIZE);
+
+    MATRIX w2(MP_OUTPUT_SIZE, std::vector<double>(MLP_H1_SIZE, 0.0));
+    std::vector<double> b2(MLP_OUTPUT_SIZE);
+
+    util.initMatrix(w1, MLP_INPUT_SIZE);
+    util.initMatrix(w2, MLP_H1_SIZE);
     return 0;
 }
 
