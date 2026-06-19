@@ -11,6 +11,8 @@
 #define CONV_WEIGHT_NUM_COL 3
 #define CONV_WEIGHT_NUM_ROW 3
 #define CONV_LAYER_NUM_ROW_COL 26
+#define MP_LAYER_STRIDE 2
+constexpr int MP_OUTPUT_SIZE = CONV_LAYER_NUM_ROW_COL /  MP_LAYER_STRIDE;
 double Relu(double input);
 
 int main() {
