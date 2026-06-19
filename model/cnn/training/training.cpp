@@ -12,8 +12,17 @@
 #define CONV_WEIGHT_NUM_ROW 3
 #define CONV_LAYER_NUM_ROW_COL 26
 #define MP_LAYER_STRIDE 2
+
+#define MLP_INPUT_SIZE 1352
+#define MLP_H1_SIZE 128
+#define MLP_OUTPUT_SIZE 10
 constexpr int MP_OUTPUT_SIZE = CONV_LAYER_NUM_ROW_COL /  MP_LAYER_STRIDE;
 double Relu(double input);
+std::vector<double> MLP(std::vector<double>& inputPool,
+                        std::vector<double>& w1,
+                        std::vector<double>& b1,
+                        std::vector<double>& w2,
+                        std::vector<double>& b2);
 
 int main() {
     Parser parser;
@@ -101,3 +110,11 @@ int main() {
 double Relu(double input) {
     return std::max(0.0, input);
 }
+
+std::vector<double> MLP(std::vector<double>& inputPool,
+    std::vector<double>& w1,
+    std::vector<double>& b1,
+    std::vector<double>& w2,
+    std::vector<double>& b2) {
+        return std::vector<double>();
+    }
