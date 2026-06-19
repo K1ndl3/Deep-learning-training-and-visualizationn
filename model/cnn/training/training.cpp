@@ -41,9 +41,9 @@ int main() {
     std::vector<double> convBias(NUM_FILTER,0.0);
 
     // the output of the convolution layer, preactivation
-    std::vector<MATRIX> convZ(NUM_FILTER, MATRIX(26, std::vector<double>(26, 0.0)));
+    std::vector<MATRIX> convZ(NUM_FILTER, MATRIX(CONV_LAYER_NUM_ROW_COL, std::vector<double>(CONV_LAYER_NUM_ROW_COL, 0.0)));
     // the output of the convolution layer, activated
-    std::vector<MATRIX> convA(NUM_FILTER, MATRIX(26, std::vector<double>(26, 0.0)));
+    std::vector<MATRIX> convA(NUM_FILTER, MATRIX(CONV_LAYER_NUM_ROW_COL, std::vector<double>(CONV_LAYER_NUM_ROW_COL, 0.0)));
     // forward pass for conv
     for (std::size_t f = 0; f < NUM_FILTER; ++f) {
         for (std::size_t row = 0; row < CONV_LAYER_NUM_ROW_COL; ++row) {
@@ -60,8 +60,8 @@ int main() {
     }
 
     for (std::size_t f = 0; f < NUM_FILTER; ++f) {
-        for (std::size_t row = 0; row < 26; ++row) {
-            for (std::size_t col = 0; col < 26; ++col) {
+        for (std::size_t row = 0; row < CONV_LAYER_NUM_ROW_COL; ++row) {
+            for (std::size_t col = 0; col < CONV_LAYER_NUM_ROW_COL; ++col) {
                 convA[f][row][col] = Relu(convZ[f][row][col]);
             }
         }
@@ -76,7 +76,7 @@ int main() {
                 for (std::size_t i = 0; i < MP_LAYER_STRIDE; ++i) {
                     for (std::size_t j = 0; j < MP_LAYER_STRIDE; ++j) {
                         if (max < convA[f][row + i][col + j]) {
-                            max = convA[f][row + 1][col + j];
+                            max = convA[f][row + i][col + j];
                         }
                     }
                 }
@@ -84,7 +84,16 @@ int main() {
             }
         }
     }
-
+    // maybe we could have created a 1d and build it from flat but who knows
+    // flatten the poolA 
+    std::vector<double> poolAFlat(NUM_FILTER * MP_OUTPUT_SIZE * MP_OUTPUT_SIZE, 0.0);
+    for (std::size_t f = 0; f < NUM_FILTER; ++f) {
+        for (std::size_t row = 0; row < MP_OUTPUT_SIZE; ++row) {
+            for (std::size_t col = 0; col < MP_OUTPUT_SIZE; ++col) {
+                poolAFlat[f * MP_OUTPUT_SIZE * MP_OUTPUT_SIZE + row * MP_OUTPUT_SIZE + col] = poolA[f][row][col];
+            }
+        }
+    }
     return 0;
 }
 
