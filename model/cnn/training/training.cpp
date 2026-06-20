@@ -3,8 +3,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <sys/types.h>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 #define NUM_FILTER 8
 #define NUM_CHANNEL 1
@@ -26,6 +28,9 @@ void MLP(std::vector<double>& inputPool,
                         std::vector<double>& a1,
                         std::vector<double>& a2);
 
+std::vector<double> softmax(const std::vector<double>& logits);
+double crossEntropy(const std::vector<double>& probs, u_int8_t label);
+
 int main() {
     Parser parser;
     Utility util;
@@ -44,6 +49,8 @@ int main() {
     // tensor for the first image
     MATRIX firstIm = imageData[0];
     std::vector<MATRIX> tensor3D;
+    // label for the first image
+    uint8_t label = labelData[0];
     // tensor3D.push_back(firstIm);
 
     // weights and biases for the convolution layer
@@ -151,4 +158,17 @@ void MLP(std::vector<double>& inputPool,
             a2[row] = sum;
         }
         
+    }
+
+    std::vector<double> softmax(const std::vector<double>& logits) {
+        double sum = 0.0;
+        for (auto logit : logits) {
+            sum += std::exp(logit);
+        }
+        std::size_t size = logits.size();
+        std::vector<double> probDist(size, 0.0);
+        for (std::size_t i = 0; i < size; ++i) {
+            probDist[i] = std::exp(logits[i]) / sum;
+        }
+        return probDist;
     }
