@@ -18,11 +18,13 @@
 #define MLP_OUTPUT_SIZE 10
 constexpr int MP_OUTPUT_SIZE = CONV_LAYER_NUM_ROW_COL /  MP_LAYER_STRIDE;
 double Relu(double input);
-std::vector<double> MLP(std::vector<double>& inputPool,
-                        std::vector<double>& w1,
+void MLP(std::vector<double>& inputPool,
+                        MATRIX& w1,
                         std::vector<double>& b1,
-                        std::vector<double>& w2,
-                        std::vector<double>& b2);
+                        MATRIX& w2,
+                        std::vector<double>& b2,
+                        std::vector<double>& a1,
+                        std::vector<double>& a2);
 
 int main() {
     Parser parser;
@@ -106,13 +108,16 @@ int main() {
 
     // weights and baises for the layers
     MATRIX w1(MLP_H1_SIZE, std::vector<double>(MLP_INPUT_SIZE, 0.0));
-    std::vector<double> b1(MLP_H1_SIZE);
+    std::vector<double> b1(MLP_H1_SIZE,0.0);
 
-    MATRIX w2(MP_OUTPUT_SIZE, std::vector<double>(MLP_H1_SIZE, 0.0));
-    std::vector<double> b2(MLP_OUTPUT_SIZE);
+    MATRIX w2(MLP_OUTPUT_SIZE, std::vector<double>(MLP_H1_SIZE, 0.0));
+    std::vector<double> b2(MLP_OUTPUT_SIZE,0.0);
 
     util.initMatrix(w1, MLP_INPUT_SIZE);
     util.initMatrix(w2, MLP_H1_SIZE);
+
+    std::vector<double> hiddenMLP(MLP_H1_SIZE, 0.0);
+    std::vector<double> outputMLP(MLP_OUTPUT_SIZE, 0.0);
     return 0;
 }
 
@@ -121,10 +126,29 @@ double Relu(double input) {
     return std::max(0.0, input);
 }
 
-std::vector<double> MLP(std::vector<double>& inputPool,
-    std::vector<double>& w1,
+void MLP(std::vector<double>& inputPool,
+    MATRIX& w1,
     std::vector<double>& b1,
-    std::vector<double>& w2,
-    std::vector<double>& b2) {
-        return std::vector<double>();
+    MATRIX& w2,
+    std::vector<double>& b2,
+    std::vector<double>& a1,
+    std::vector<double>& a2) {
+        // pass through the first layer
+        for (std::size_t row = 0; row < MLP_H1_SIZE; ++row) {
+            double sum = b1[row];
+            for (std::size_t col = 0; col < MLP_INPUT_SIZE; ++col) {
+                sum += inputPool[col] * w1[row][col];
+            }
+            a1[row] = Relu(sum);
+        }
+
+        // pass through the hidden layer
+        for (std::size_t row = 0; row < MLP_OUTPUT_SIZE; ++row) {
+            double sum = b2[row];
+            for (std::size_t col = 0; col < MLP_H1_SIZE; ++col) {
+                sum += a1[col] * w2[row][col];
+            }
+            a2[row] = sum;
+        }
+        
     }
