@@ -172,3 +172,13 @@ void MLP(std::vector<double>& inputPool,
         }
         return probDist;
     }
+
+    double crossEntropy(const std::vector<double>& probs, u_int8_t label) {
+        double sum = 0.0;
+        for (std::size_t k = 0; k < probs.size(); ++k) {
+            uint8_t labelValue = (k == label) ? 1 : 0;
+            sum += labelValue * std::log(probs[k]);
+        }
+
+        return -1 * sum;
+    }
